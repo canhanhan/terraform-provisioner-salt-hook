@@ -14,7 +14,7 @@ resource "null_resource" "test" {
         password = "test"
         backend = "pam"
         id = "test"
-        hebele = {
+        data = {
             sample_key = "sample_data"
         }
     }
