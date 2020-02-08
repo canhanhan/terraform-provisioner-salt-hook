@@ -48,14 +48,14 @@ func Provisioner() terraform.ResourceProvisioner {
 }
 
 func apply(ctx context.Context) error {
-	data := ctx.Value(schema.ProvConfigDataKey).(*schema.ResourceData)
+	d := ctx.Value(schema.ProvConfigDataKey).(*schema.ResourceData)
 
 	cli := salt.NewClient(
-		data.Get("address").(string),
-		data.Get("username").(string),
-		data.Get("password").(string),
-		data.Get("backend").(string),
-		data.Get("skip_verify").(bool),
+		d.Get("address").(string),
+		d.Get("username").(string),
+		d.Get("password").(string),
+		d.Get("backend").(string),
+		d.Get("skip_verify").(bool),
 	)
 
 	if err := cli.Login(ctx); err != nil {
@@ -64,8 +64,8 @@ func apply(ctx context.Context) error {
 
 	defer cli.Logout(ctx)
 
-	tag := data.Get("id").(string)
-	eventData := data.Get("data").(map[string]interface{})
+	tag := d.Get("id").(string)
+	eventData := d.Get("data").(map[string]interface{})
 
 	if err := cli.Hook(ctx, tag, eventData); err != nil {
 		return err
