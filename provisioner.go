@@ -27,6 +27,11 @@ func Provisioner() terraform.ResourceProvisioner {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"skip_verify": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"id": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -50,18 +55,19 @@ func apply(ctx context.Context) error {
 		data.Get("username").(string),
 		data.Get("password").(string),
 		data.Get("backend").(string),
+		data.Get("skip_verify").(bool),
 	)
 
-	if err := cli.Login(); err != nil {
+	if err := cli.Login(ctx); err != nil {
 		return err
 	}
 
-	defer cli.Logout()
+	defer cli.Logout(ctx)
 
 	tag := data.Get("id").(string)
 	eventData := data.Get("data").(map[string]interface{})
 
-	if err := cli.Hook(tag, eventData); err != nil {
+	if err := cli.Hook(ctx, tag, eventData); err != nil {
 		return err
 	}
 
